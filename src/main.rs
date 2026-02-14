@@ -196,7 +196,17 @@ fn get_bible_data() -> Vec<Book> {
                 Chapter {
                     chapter_number: 1,
                     sections: vec![
-                        SectionHeading { heading: "The Genealogy of Jesus Christ".to_string() },
+                        SectionHeading { heading: "Superscription: The Messianic Thesis Statement (1:1)".to_string() },
+                        SectionHeading { heading: "Abraham to David: Covenant Line through the Patriarchs (1:2–6a)".to_string() },
+                        SectionHeading { heading: "David to the Exile: Royal Decline and Judgment (1:6b–11)".to_string() },
+                        SectionHeading { heading: "Exile to Messiah: Restoration and Fulfillment (1:12–16)".to_string() },
+                        SectionHeading { heading: "Theological Structuring of Israel's History (1:17)".to_string() },
+                        SectionHeading { heading: "Conception by the Holy Spirit (1:18)".to_string() },
+                        SectionHeading { heading: "Joseph's Righteousness and Intended Mercy (1:19)".to_string() },
+                        SectionHeading { heading: "Angelic Revelation: Divine Initiative Explained (1:20–21)".to_string() },
+                        SectionHeading { heading: "Prophetic Fulfillment Citation (1:22–23)".to_string() },
+                        SectionHeading { heading: "Obedient Response of Joseph (1:24–25a)".to_string() },
+                        SectionHeading { heading: "Naming the Child (1:25b)".to_string() },
                     ],
                 },
                 Chapter {
