@@ -19,6 +19,10 @@ bible-headlines/
 ├── Cargo.toml              # Rust dependencies
 ├── src/
 │   └── main.rs            # Main application code
+├── docs/                  # GitHub Pages deployment
+│   ├── index.html        # Static HTML export from Rust server
+│   ├── data.json         # JSON export (optional, for reference)
+│   └── README.md         # Deployment instructions
 ├── README.md              # User documentation
 └── .github/
     └── copilot-instructions.md  # This file
@@ -230,6 +234,36 @@ lsof -ti:8080 | xargs kill -9
 3. Run `cargo build` to check for errors
 4. Run `cargo run` to start the updated server
 5. Test in browser at `http://localhost:8080`
+
+### Deploying to GitHub Pages
+
+The site is deployed as a static HTML page on GitHub Pages.
+
+**Setup (one-time)**:
+1. Go to repository Settings → Pages
+2. Set Source to: Branch `main`, Folder `/docs`
+3. Save and wait 1-2 minutes for initial deployment
+
+**Updating the deployed site**:
+
+```bash
+# 1. Make sure your Rust server is running
+cargo run
+
+# 2. Export the complete HTML to docs folder
+curl http://localhost:8080 > docs/index.html
+
+# 3. Commit and push to GitHub
+git add docs/index.html
+git commit -m "Update Bible content"
+git push
+```
+
+**Live URL**: https://chamorrowizard.github.io/bible-headlines/
+
+GitHub Pages automatically rebuilds within 1-2 minutes after pushing changes.
+
+**Important**: The `docs/index.html` file should always be the exact HTML output from your Rust server to ensure the live site matches your local development version.
 
 ## Code Organization
 
