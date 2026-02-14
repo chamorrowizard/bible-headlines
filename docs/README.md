@@ -42,6 +42,6 @@ Then visit: http://localhost:8000
 Whenever you update the Rust application:
 
 1. Run the server: `cargo run`
-2. Export new data: `curl http://localhost:8080/api/books > docs/data.json`
-3. Commit and push changes
-4. GitHub Pages will auto-deploy
+2. Export the full HTML: `curl http://localhost:8080 > docs/index.html`
+3. Commit and push changes: `git add docs/ && git commit -m "Update content" && git push`
+4. GitHub Pages will auto-deploy in 1-2 minutes
