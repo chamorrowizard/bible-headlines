@@ -1,4 +1,4 @@
-use actix_web::{web, App, HttpResponse, HttpServer, Result};
+use actix_web::{web, App, HttpServer, HttpResponse, Result};
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 
@@ -212,8 +212,17 @@ fn get_bible_data() -> Vec<Book> {
                 Chapter {
                     chapter_number: 2,
                     sections: vec![
-                        SectionHeading { heading: "The Visit of the Wise Men".to_string() },
-                        SectionHeading { heading: "The Flight to Egypt".to_string() },
+                        SectionHeading { heading: "The Birth in Bethlehem and the Arrival of the Magi (2:1–2)".to_string() },
+                        SectionHeading { heading: "Herod's Alarm and Prophetic Clarification (2:3–6)".to_string() },
+                        SectionHeading { heading: "Herod's Deceptive Inquiry (2:7–8)".to_string() },
+                        SectionHeading { heading: "The Star's Guidance and Joyful Confirmation (2:9–10)".to_string() },
+                        SectionHeading { heading: "Homage and Royal Gifts (2:11)".to_string() },
+                        SectionHeading { heading: "Divine Warning and Providential Protection (2:12)".to_string() },
+                        SectionHeading { heading: "Escape to Egypt and Fulfillment of Scripture (2:13–15)".to_string() },
+                        SectionHeading { heading: "The Massacre of the Infants (2:16–18)".to_string() },
+                        SectionHeading { heading: "Death of Herod and Return from Egypt (2:19–21)".to_string() },
+                        SectionHeading { heading: "Fear of Archelaus (2:22)".to_string() },
+                        SectionHeading { heading: "Settlement in Nazareth and Prophetic Fulfillment (2:23)".to_string() },
                     ],
                 },
                 Chapter {
@@ -920,7 +929,10 @@ async fn main() -> std::io::Result<()> {
         books: Arc::new(bible_data),
     });
 
-    println!("🚀 Server starting at http://localhost:8080");
+    let port = std::env::var("PORT").unwrap_or_else(|_| "8080".to_string());
+    let bind_address = format!("0.0.0.0:{}", port);
+
+    println!("🚀 Server starting at http://{}", bind_address);
     println!("📖 View Bible Section Headlines");
     
     HttpServer::new(move || {
@@ -929,7 +941,7 @@ async fn main() -> std::io::Result<()> {
             .route("/", web::get().to(index))
             .route("/api/books", web::get().to(api_books))
     })
-    .bind(("127.0.0.1", 8080))?
+    .bind(&bind_address)?
     .run()
     .await
 }
