@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bible Section Headlines</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 1rem;
+            color: #2d3748;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+        }
+        
+        h1 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 3rem;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 0.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+            letter-spacing: -1px;
+        }
+        
+        .subtitle {
+            font-size: 1.1rem;
+            color: rgba(255,255,255,0.9);
+            font-weight: 300;
+            letter-spacing: 0.5px;
+            margin-bottom: 1.5rem;
+        }
+        
+        .controls {
+            background: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .search-container {
+            position: relative;
+            flex: 1;
+        }
+        
+        .search-box {
+            width: 100%;
+            padding: 1rem 1rem 1rem 3rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.3s ease;
+            background: #f7fafc;
+        }
+        
+        .search-box:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .search-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #667eea;
+            font-size: 1.2rem;
+        }
+        
+        .filter-buttons {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+        
+        .filter-btn {
+            padding: 0.75rem 1.5rem;
+            border: 2px solid #e2e8f0;
+            background: white;
+            border-radius: 10px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: #4a5568;
+        }
+        
+        .filter-btn:hover {
+            border-color: #667eea;
+            color: #667eea;
+            transform: translateY(-2px);
+        }
+        
+        .filter-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: transparent;
+        }
+        
+        .stats {
+            text-align: center;
+            color: #4a5568;
+            font-size: 0.9rem;
+            padding: 0.5rem;
+        }
+        
+        .loading {
+            text-align: center;
+            color: white;
+            font-size: 1.2rem;
+            padding: 3rem;
+        }
+        
+        .book-card {
+            background: white;
+            border-radius: 16px;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+        
+        .book-card.hidden {
+            display: none;
+        }
+        
+        .book-card.collapsed .chapters-grid {
+            display: none;
+        }
+        
+        .book-card.collapsed .expand-icon {
+            transform: rotate(-90deg);
+        }
+        
+        .book-header {
+            padding: 1.5rem 2rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background-color 0.2s ease;
+        }
+        
+        .book-header:hover {
+            background-color: rgba(102, 126, 234, 0.05);
+        }
+        
+        .book-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2rem;
+            font-weight: 700;
+            color: #667eea;
+            margin: 0;
+        }
+        
+        .expand-icon {
+            font-size: 1.5rem;
+            color: #667eea;
+            transition: transform 0.3s ease;
+            user-select: none;
+        }
+        
+        .chapters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.25rem;
+            padding: 1.5rem 2rem 2rem;
+        }
+        
+        .chapter-card {
+            background: linear-gradient(135deg, #f6f8fb 0%, #ffffff 100%);
+            border-radius: 12px;
+            padding: 1.25rem;
+            border: 1px solid #e2e8f0;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .chapter-card.hidden {
+            display: none;
+        }
+        
+        .chapter-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .chapter-card:hover {
+            border-color: #667eea;
+            transform: translateX(4px);
+        }
+        
+        .chapter-card:hover::before {
+            opacity: 1;
+        }
+        
+        .chapter-header {
+            margin-bottom: 1rem;
+        }
+        
+        .chapter-number {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #4a5568;
+            display: inline-block;
+            padding: 0.35rem 0.75rem;
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: 8px;
+        }
+        
+        .sections {
+            display: flex;
+            flex-direction: column;
+            gap: 0.65rem;
+        }
+        
+        .section-heading {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.65rem;
+            padding: 0.4rem;
+            border-radius: 6px;
+            transition: background-color 0.2s ease;
+        }
+        
+        .section-heading:hover {
+            background-color: rgba(102, 126, 234, 0.05);
+        }
+        
+        .bullet {
+            color: #667eea;
+            font-size: 1.3rem;
+            line-height: 1.4;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+        
+        .heading-text {
+            font-size: 0.95rem;
+            color: #2d3748;
+            line-height: 1.5;
+            font-weight: 400;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 2rem;
+            color: rgba(255,255,255,0.9);
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.2rem;
+            }
+            
+            .subtitle {
+                font-size: 1rem;
+            }
+            
+            .controls {
+                padding: 1.25rem;
+            }
+            
+            .filter-buttons {
+                justify-content: center;
+            }
+            
+            .filter-btn {
+                flex: 1;
+                min-width: 100px;
+                padding: 0.7rem 1rem;
+                font-size: 0.9rem;
+            }
+            
+            .book-header {
+                padding: 1.25rem 1.5rem;
+            }
+            
+            .book-title {
+                font-size: 1.6rem;
+            }
+            
+            .chapters-grid {
+                grid-template-columns: 1fr;
+                padding: 1.25rem 1.5rem 1.5rem;
+            }
+        }
+        
+        @media (min-width: 769px) {
+            .controls {
+                flex-direction: row;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>✦ Bible Section Headlines ✦</h1>
+            <p class="subtitle">Explore all 66 Books of Scripture</p>
+        </header>
+        
+        <div class="controls">
+            <div class="search-container">
+                <span class="search-icon">🔍</span>
+                <input 
+                    type="text" 
+                    class="search-box" 
+                    id="searchBox" 
+                    placeholder="Search books, chapters, or section headings..."
+                    oninput="filterContent()"
+                >
+            </div>
+            <div class="filter-buttons">
+                <button class="filter-btn active" onclick="filterTestament('all')">All Books</button>
+                <button class="filter-btn" onclick="filterTestament('old')">Old Testament</button>
+                <button class="filter-btn" onclick="filterTestament('new')">New Testament</button>
+            </div>
+        </div>
+        
+        <div class="stats" id="stats"></div>
+        
+        <div class="loading" id="loading">Loading Bible data...</div>
+        <div class="books-container" id="booksContainer" style="display: none;"></div>
+        
+        <footer>
+            <p>A reverent way to explore Scripture • Add detailed sections as you study</p>
+        </footer>
+    </div>
+    
+    <script>
+        let booksData = [];
+        let currentTestament = 'all';
+        
+        // Load Bible data
+        fetch('data.json')
+            .then(response => response.json())
+            .then(data => {
+                booksData = data;
+                renderBooks();
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('booksContainer').style.display = 'block';
+                initializeCollapsed();
+                filterContent();
+            })
+            .catch(error => {
+                console.error('Error loading Bible data:', error);
+                document.getElementById('loading').textContent = 'Error loading Bible data. Please refresh the page.';
+            });
+        
+        function renderBooks() {
+            const container = document.getElementById('booksContainer');
+            container.innerHTML = '';
+            
+            booksData.forEach(book => {
+                const testamentClass = book.testament === 'Old' ? 'old-testament' : 'new-testament';
+                
+                const bookCard = document.createElement('div');
+                bookCard.className = `book-card ${testamentClass}`;
+                bookCard.setAttribute('data-book-name', book.name.toLowerCase());
+                bookCard.setAttribute('data-testament', testamentClass);
+                
+                const bookHeader = document.createElement('div');
+                bookHeader.className = 'book-header';
+                bookHeader.onclick = function() { toggleBook(this); };
+                
+                const bookTitle = document.createElement('h2');
+                bookTitle.className = 'book-title';
+                bookTitle.textContent = book.name;
+                
+                const expandIcon = document.createElement('span');
+                expandIcon.className = 'expand-icon';
+                expandIcon.textContent = '▼';
+                
+                bookHeader.appendChild(bookTitle);
+                bookHeader.appendChild(expandIcon);
+                
+                const chaptersGrid = document.createElement('div');
+                chaptersGrid.className = 'chapters-grid';
+                
+                book.chapters.forEach(chapter => {
+                    const searchText = chapter.sections.map(s => s.heading.toLowerCase()).join(' ');
+                    
+                    const chapterCard = document.createElement('div');
+                    chapterCard.className = 'chapter-card';
+                    chapterCard.setAttribute('data-search-text', searchText);
+                    
+                    const chapterHeader = document.createElement('div');
+                    chapterHeader.className = 'chapter-header';
+                    
+                    const chapterNumber = document.createElement('span');
+                    chapterNumber.className = 'chapter-number';
+                    chapterNumber.textContent = `Chapter ${chapter.chapter_number}`;
+                    
+                    chapterHeader.appendChild(chapterNumber);
+                    
+                    const sections = document.createElement('div');
+                    sections.className = 'sections';
+                    
+                    chapter.sections.forEach(section => {
+                        const sectionHeading = document.createElement('div');
+                        sectionHeading.className = 'section-heading';
+                        
+                        const bullet = document.createElement('span');
+                        bullet.className = 'bullet';
+                        bullet.textContent = '•';
+                        
+                        const headingText = document.createElement('span');
+                        headingText.className = 'heading-text';
+                        headingText.textContent = section.heading;
+                        
+                        sectionHeading.appendChild(bullet);
+                        sectionHeading.appendChild(headingText);
+                        sections.appendChild(sectionHeading);
+                    });
+                    
+                    chapterCard.appendChild(chapterHeader);
+                    chapterCard.appendChild(sections);
+                    chaptersGrid.appendChild(chapterCard);
+                });
+                
+                bookCard.appendChild(bookHeader);
+                bookCard.appendChild(chaptersGrid);
+                container.appendChild(bookCard);
+            });
+        }
+        
+        function toggleBook(header) {
+            const bookCard = header.parentElement;
+            bookCard.classList.toggle('collapsed');
+        }
+        
+        function filterTestament(testament) {
+            currentTestament = testament;
+            
+            // Update button states
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            filterContent();
+        }
+        
+        function filterContent() {
+            const searchTerm = document.getElementById('searchBox').value.toLowerCase();
+            const bookCards = document.querySelectorAll('.book-card');
+            let visibleBooks = 0;
+            let visibleChapters = 0;
+            
+            bookCards.forEach(bookCard => {
+                const bookName = bookCard.getAttribute('data-book-name');
+                const testament = bookCard.getAttribute('data-testament');
+                const chapters = bookCard.querySelectorAll('.chapter-card');
+                
+                // Testament filter
+                let testamentMatch = currentTestament === 'all' || 
+                                    testament === currentTestament + '-testament';
+                
+                // Search filter
+                let bookMatches = bookName.includes(searchTerm);
+                let hasVisibleChapter = false;
+                
+                chapters.forEach(chapter => {
+                    const searchText = chapter.getAttribute('data-search-text');
+                    const chapterMatches = searchTerm === '' || 
+                                          bookMatches || 
+                                          searchText.includes(searchTerm);
+                    
+                    if (chapterMatches && testamentMatch) {
+                        chapter.classList.remove('hidden');
+                        hasVisibleChapter = true;
+                        visibleChapters++;
+                    } else {
+                        chapter.classList.add('hidden');
+                    }
+                });
+                
+                if ((bookMatches || hasVisibleChapter) && testamentMatch) {
+                    bookCard.classList.remove('hidden');
+                    if (searchTerm !== '') {
+                        bookCard.classList.remove('collapsed');
+                    }
+                    visibleBooks++;
+                } else {
+                    bookCard.classList.add('hidden');
+                }
+            });
+            
+            // Update stats
+            const stats = document.getElementById('stats');
+            if (searchTerm === '' && currentTestament === 'all') {
+                stats.textContent = `Showing all 66 books`;
+            } else {
+                stats.textContent = `Found ${visibleBooks} book${visibleBooks !== 1 ? 's' : ''} with ${visibleChapters} chapter${visibleChapters !== 1 ? 's' : ''}`;
+            }
+        }
+        
+        function initializeCollapsed() {
+            document.querySelectorAll('.book-card').forEach(card => {
+                card.classList.add('collapsed');
+            });
+        }
+    </script>
+</body>
+</html>
