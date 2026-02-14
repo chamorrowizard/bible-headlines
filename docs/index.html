@@ -272,6 +272,14 @@
             font-weight: 400;
         }
         
+        .highlight {
+            background-color: #fef08a;
+            color: #854d0e;
+            padding: 0.1rem 0.2rem;
+            border-radius: 3px;
+            font-weight: 600;
+        }
+        
         footer {
             text-align: center;
             padding: 2rem;
@@ -13654,11 +13662,37 @@
             filterContent();
         }
         
+        function highlightText(element, searchTerm) {
+            if (!searchTerm || searchTerm.length < 2) {
+                return;
+            }
+            
+            const textElements = element.querySelectorAll('.heading-text, .book-title, .chapter-number');
+            textElements.forEach(el => {
+                const originalText = el.textContent;
+                const regex = new RegExp(`(${searchTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+                const highlightedText = originalText.replace(regex, '<span class="highlight">$1</span>');
+                if (originalText !== highlightedText) {
+                    el.innerHTML = highlightedText;
+                }
+            });
+        }
+        
+        function clearHighlights() {
+            document.querySelectorAll('.highlight').forEach(el => {
+                const parent = el.parentNode;
+                parent.replaceChild(document.createTextNode(el.textContent), el);
+            });
+        }
+        
         function filterContent() {
             const searchTerm = document.getElementById('searchBox').value.toLowerCase();
             const bookCards = document.querySelectorAll('.book-card');
             let visibleBooks = 0;
             let visibleChapters = 0;
+            
+            // Clear previous highlights
+            clearHighlights();
             
             bookCards.forEach(bookCard => {
                 const bookName = bookCard.getAttribute('data-book-name');
@@ -13692,6 +13726,8 @@
                     bookCard.classList.remove('hidden');
                     if (searchTerm !== '') {
                         bookCard.classList.remove('collapsed');
+                        // Highlight matching terms
+                        highlightText(bookCard, searchTerm);
                     }
                     visibleBooks++;
                 } else {
